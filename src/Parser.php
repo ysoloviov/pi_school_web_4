@@ -40,7 +40,7 @@ class Parser
 
 			/* Bit mask indicates whether a field should be interpreted
 			 * in any special way and is used primarily for extending purposes;
-			 * context fields takes precedence over regular ones.
+			 * context fields take precedence over regular ones.
 			 */
 			if($context & self::CONTEXT_CHANGE_MAP) {
 				$description = str_replace($key, $value, $article->getDescription());
