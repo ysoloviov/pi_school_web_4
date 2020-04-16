@@ -1,0 +1,53 @@
+#!/usr/bin/php
+<?php
+
+declare(strict_types=1);
+
+require_once __DIR__ . "/../week_1/task_1.php";
+require_once __DIR__ . "/../src/Parser.php";
+require_once __DIR__ . "/../src/Article.php";
+require_once __DIR__ . "/../src/Renderer.php";
+
+const REQUIRED_TAG = "Automotive Industry";
+
+$html = new Renderer;
+$parser = new Parser($data);
+$parser->parse();
+$articles = $parser->getArticles();
+$tags = [];
+
+$html
+	->openTag("html")
+	->openTag("body")
+	->openTag("table-of-content");
+
+/* render table of contents */
+foreach($articles as $article) {
+	if($article->hasTag(REQUIRED_TAG))
+		$html->insertChild("div", $article->getTitle());
+}
+
+$html
+	->closeTag()
+	->openTag("content");
+
+foreach($articles as $article) {
+	if(!$article->hasTag(REQUIRED_TAG))
+		continue;
+
+	/* make unique vocabulary */
+	foreach($article->getTags() as $tag)
+		$tags[$tag] = 1;
+
+	/* render article */
+	$html
+		->openTag("article")
+		->insertChild("h1", $article->getTitle())
+		->insertChild("p", $article->getDescription())
+		->closeTag();
+}
+
+$html
+	->closeTag()
+	->insertChild("tags", implode(", ", array_keys($tags)))
+	->closeTags();
