@@ -3,7 +3,7 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . "/../week_1/task_1.php";
+require_once __DIR__ . "/../task_1.php";
 require_once __DIR__ . "/../src/Parser.php";
 require_once __DIR__ . "/../src/Article.php";
 require_once __DIR__ . "/../src/Renderer.php";
