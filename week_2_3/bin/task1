@@ -1,0 +1,29 @@
+#!/usr/bin/php
+<?php
+
+declare(strict_types=1);
+
+require_once __DIR__ . "/../vendor/autoload.php";
+
+use Network\NetworkManager;
+use Task\Task1;
+
+/* config files */
+$geodata = require_once(__DIR__ . "/../cfg/geodata.php");
+$config = require_once(__DIR__ . "/../cfg/config.php");
+
+/* WeatherInterface implementation */
+$weather = new $config["weather"](new NetworkManager,
+	$config["open_weather"]["key"], $config["open_weather"]["units"]);
+
+/* declare order of interested cities */
+$data = [];
+$data[] = $geodata[380]["Kiev"];
+$data[] = $geodata[49]["Berlin"];
+$data[] = $geodata[44]["London"];
+$data[] = $geodata[1]["New York"];
+$data[] = $geodata[1]["Los Angeles"];
+
+/* write forecast to the file */
+$task = new Task1($weather);
+$task($data, $config["task1"]["file"]);
