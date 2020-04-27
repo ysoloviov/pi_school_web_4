@@ -1,0 +1,59 @@
+#!/usr/bin/php
+<?php
+
+declare(strict_types=1);
+
+require_once __DIR__ . "/../vendor/autoload.php";
+
+use Network\NetworkManager;
+use Task\Task2;
+
+function usage(string $prg):void
+{
+	$usage = [
+		"Usage:",
+		"  ${prg} COUNTRY_CODE CITY",
+		"  ${prg} LATITUDE LONGTITUDE TIMEZONE",
+		"If a city is defined in the geodata config file,",
+		"the first form is allowed, otherwise use second form.",
+	];
+	fwrite(STDERR, implode(PHP_EOL, $usage) . PHP_EOL);
+	exit(1);
+}
+
+/* config files */
+$geodata = require_once(__DIR__ . "/../cfg/geodata.php");
+$config = require_once(__DIR__ . "/../cfg/config.php");
+
+/* WeatherInterface implementation */
+$weather = new $config["weather"](new NetworkManager,
+	$config["open_weather"]["key"], $config["open_weather"]["units"]);
+
+/* first form */
+if($argc === 3) {
+	if(!array_key_exists($argv[1], $geodata)
+		|| !array_key_exists($argv[2], $geodata[$argv[1]])) {
+		fwrite(STDERR, "No geodata found for given city, use verbatim form." . PHP_EOL);
+		usage($argv[0]);
+	}
+
+	$data = $geodata[$argv[1]][$argv[2]];
+}
+/* second form */
+else if($argc === 4
+	&& is_numeric($argv[1])
+	&& is_numeric($argv[2])) {
+	$data = [
+		"name" => "N/A",
+		"lat" => (float) $argv[1],
+		"long" => (float) $argv[2],
+		"timezone" => $argv[3],
+	];
+}
+else {
+	usage($argv[0]);
+}
+
+/* write forecast to the file */
+$task = new Task2($weather);
+$task($data, $config["task2"]["file"]);
