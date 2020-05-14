@@ -1,0 +1,27 @@
+#!/usr/bin/php
+<?php
+
+declare(strict_types=1);
+
+require_once __DIR__ . "/../vendor/autoload.php";
+
+use App\PurchaseLog\JsonFileReader;
+use App\Task\FillDatabaseTask;
+use QueryBuilder\QueryBuilder;
+use Environment\Environment;
+use Database\Database;
+
+$cfg = require_once(__DIR__ . "/../cfg/task.php");
+
+/* load environment variables */
+$env = new Environment(__DIR__ . "/../env");
+$env->scan();
+
+/* set up connection to database */
+$database = new Database($env["DB_DRIVER"], $env["DB_HOST"], $env["DB_NAME"],
+	$env["DB_USER"], $env["DB_PASSWORD"]);
+
+/* fill database */
+$purchases = new JsonFileReader(__DIR__ . "/../" . $cfg["file"]);
+$task = new FillDatabaseTask($database, new QueryBuilder($database));
+$task($purchases);
