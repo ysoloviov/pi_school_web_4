@@ -1,0 +1,12 @@
+{
+	"name": "pschool/week89",
+	"autoload": {
+		"psr-4": {
+			"": "lib/",
+			"App\\": "src/"
+		}
+	},
+	"require": {
+		"php": ">=7.4"
+	}
+}

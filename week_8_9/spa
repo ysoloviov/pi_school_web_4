@@ -1,0 +1,43 @@
+Define LOG_DIR /var/log/httpd
+Define ROOT_DIR /home/damage/dev/pschool/week_8_9
+
+<VirtualHost *:80>
+	Define SERVER back
+	ServerAdmin damage220@gmail.com
+	DocumentRoot "${ROOT_DIR}/${SERVER}"
+	ServerName ${SERVER}
+	ErrorLog "${LOG_DIR}/${SERVER}_error_log"
+	CustomLog "${LOG_DIR}/${SERVER}_access_log" common
+	Header set Access-Control-Allow-Origin "http://front"
+	Header set Access-Control-Allow-Headers "Content-Type"
+	Header set Access-Control-Allow-Credentials "true"
+	DirectoryIndex index.php?uri=/
+	<FilesMatch \.php$>
+		SetHandler application/x-httpd-php
+	</FilesMatch>
+	<Directory "${ROOT_DIR}/${SERVER}">
+		RewriteEngine On
+		RewriteBase /
+		RewriteCond %{REQUEST_FILENAME} !-f
+		RewriteCond %{REQUEST_FILENAME} !-d
+		RewriteRule ^(.*)$ /index.php?uri=/$1 [NC,L,QSA]
+	</Directory>
+</VirtualHost>
+<VirtualHost *:80>
+	Define SERVER front
+	ServerAdmin damage220@gmail.com
+	DocumentRoot "${ROOT_DIR}/${SERVER}"
+	ServerName ${SERVER}
+	ErrorLog "${LOG_DIR}/${SERVER}_error_log"
+	CustomLog "${LOG_DIR}/${SERVER}_access_log" common
+	<Directory "${ROOT_DIR}/${SERVER}">
+		RewriteEngine On
+		RewriteBase /
+		RewriteCond %{REQUEST_FILENAME} !-f
+		RewriteCond %{REQUEST_FILENAME} !-d
+		RewriteRule ^(.*)$ /index.html [NC,L,QSA]
+	</Directory>
+</VirtualHost>
+<Directory "${ROOT_DIR}">
+	Require all granted
+</Directory>
